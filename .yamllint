@@ -4,6 +4,9 @@ extends: default
 ignore: |
   .cache/
   .ansible/
+  ansible.cfg
+  README.md
+  setup.sh
 
 rules:
   # Task files in tasks/ are fragments included by the playbook and
