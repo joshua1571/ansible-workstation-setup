@@ -1,0 +1,41 @@
+- name: Install Adobe Source Code Pro font
+  ansible.builtin.import_tasks: tasks/font_adobe_source_code_pro.yml
+
+- name: Get Ptyxis default profile uuid
+  ansible.builtin.command: gsettings get org.gnome.Ptyxis default-profile-uuid
+  register: profile_id_raw
+  changed_when: false
+
+- name: Set profile id fact
+  ansible.builtin.set_fact:
+    profile_id: "{{ profile_id_raw.stdout | regex_replace(\"[']\", '') }}"
+
+- name: Disable use of system font
+  community.general.dconf:
+    key: "/org/gnome/Ptyxis/Profiles/:{{ profile_id }}/use-system-font"
+    value: "false"
+    state: present
+
+- name: Customize terminal font
+  community.general.dconf:
+    key: "/org/gnome/Ptyxis/Profiles/:{{ profile_id }}/font-name"
+    value: "'Source Code Pro 12'"
+    state: present
+
+- name: Customize terminal turn off audible bell
+  community.general.dconf:
+    key: "/org/gnome/Ptyxis/Profiles/:{{ profile_id }}/audible-bell"
+    value: "false"
+    state: present
+
+- name: Customize terminal set background transparency
+  community.general.dconf:
+    key: "/org/gnome/Ptyxis/Profiles/:{{ profile_id }}/opacity"
+    value: "0.9"
+    state: present
+
+- name: Customize terminal set gruvbox dark palette
+  community.general.dconf:
+    key: "/org/gnome/Ptyxis/Profiles/:{{ profile_id }}/palette"
+    value: "'gruvbox-dark'"
+    state: present

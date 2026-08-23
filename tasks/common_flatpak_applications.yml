@@ -1,0 +1,22 @@
+- name: Install flatpak applications from flathub
+  community.general.flatpak:
+    name: "{{ item }}"
+    remote: flathub
+    method: user
+    state: present
+  with_items:
+    # If any of the below programs need additional configuration create a new tasks file instead
+    - com.spotify.Client
+    - com.discordapp.Discord
+    - com.brave.Browser
+    - com.valvesoftware.Steam
+    - org.qbittorrent.qBittorrent
+    - org.deskflow.deskflow
+    - md.obsidian.Obsidian
+    - org.localsend.localsend_app
+    - org.mozilla.thunderbird
+    - org.jellyfin.JellyfinDesktop
+    - us.zoom.Zoom
+    - cc.arduino.IDE2
+    - com.nextcloud.desktopclient.nextcloud
+    - org.strawberrymusicplayer.strawberry

@@ -1,0 +1,13 @@
+- name: Install GitHub Desktop from flathub
+  community.general.flatpak:
+    name: io.github.shiftey.Desktop
+    remote: flathub
+    method: user
+    state: present
+
+- name: Install GitHub CLI tool
+  become: true
+  ansible.builtin.package:
+    name:
+      - gh
+    state: present

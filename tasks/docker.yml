@@ -1,0 +1,50 @@
+### 
+### !!!UNTESTED!!!
+### DO NOT USE
+###
+- name: Add docker repo key
+  become: true
+  ansible.builtin.rpm_key:
+    key: https://download.docker.com/linux/fedora/gpg
+    state: present
+
+- name: Add docker repo
+  become: true
+  ansible.builtin.yum_repository:
+    name: docker-ce-stable
+    description: Docker CE Stable - $basearch
+    baseurl: https://download.docker.com/linux/fedora/$releasever/$basearch/stable
+    gpgkey: https://download.docker.com/linux/fedora/gpg
+    file: docker
+    gpgcheck: yes
+    enabled: yes
+
+- name: Install docker
+  become: true
+  ansible.builtin.package:
+    name: 
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-compose-plugin
+    update_cache: true
+
+- name: Enable and start docker
+  become: true
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Create docker group
+  become: true
+  ansible.builtin.group:
+    name: docker
+    state: present
+
+- name: Add user to docker
+  become: true
+  ansible.builtin.user:
+    name: "{{ workstation_user }}"
+    groups: docker
+    append: true

@@ -1,0 +1,8 @@
+- name: Install common command-line utilities
+  become: true
+  ansible.builtin.package:
+    name:
+      - curl
+      - wget
+      - rsync
+      - nmap

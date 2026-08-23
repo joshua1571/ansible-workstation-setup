@@ -1,0 +1,5 @@
+- name: Install Amazon Web Services CLI tool (Version 2)
+  become: true
+  ansible.builtin.package:
+    name:
+      - awscli2

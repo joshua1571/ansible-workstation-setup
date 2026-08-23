@@ -1,0 +1,50 @@
+- name: Install neovim
+  become: true
+  ansible.builtin.package:
+    name:
+      - neovim
+    state: present
+
+- name: Create neovim config folder
+  ansible.builtin.file:
+    path: "/home/{{ workstation_user }}/.config/nvim"
+    state: directory
+    owner: "{{ workstation_user }}"
+    group: "{{ workstation_group }}"
+    mode: '0755'
+
+- name: Add neovim config file
+  ansible.builtin.copy:
+    dest: /home/{{ workstation_user }}/.config/nvim/init.vim
+    owner: "{{ workstation_user }}"
+    group: "{{ workstation_group }}"
+    mode: '0644'
+    backup: true
+    content: |
+      syntax enable
+      set textwidth=79
+      set shiftwidth=4
+      set tabstop=4
+      set expandtab
+      set softtabstop=4
+      set shiftround
+      set autoindent
+      set smarttab
+      set ignorecase
+      set incsearch
+      set hlsearch
+      set ruler
+      set number
+      set relativenumber
+      set visualbell
+      set title
+      set wildmenu
+      set history=100
+      set termguicolors
+      "set cursorline
+      set showcmd
+      set showmatch
+      "set foldenable
+      "set foldmethod=indent
+      "set foldnestmax=1
+      "set foldlevelstart=0

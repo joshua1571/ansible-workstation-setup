@@ -1,16 +1,30 @@
-# workstation-setup
+### Purpose
+I created this playbook to configure a brand new fedora workstation install to configure everything for me.
+Tested on Fedora workstation 44
 
-# Get rid of old containers
-docker container prune -f
+### Prerequisites
+User should already be created
+Internet connectivity is established
 
-# Remove old image
-docker image rm ansible-docker
+### How to Use
+Clone this repository to the newly created Fedora workstation
+``cd`` to the cloned repository
+Modify ``workstation_user`` and ``workstation_group`` variables in workstation-setup.yml to match your user
+Run ``./setup.sh`` which will update and upgrade host as well as install ansible
+Run ``./workstation-setup.yml`` which will configure host
 
-# build new image
-docker build -t ansible-docker:latest .
+### TODOs
 
-# Run test playbook
-docker run -it -v "$(PWD):/root/ansible" ansible-docker -i /root/ansible/hosts /root/ansible/docker_test.yml --ask-become-pass
+- Add support for remote installation
 
-# Debug container environment
-docker run -it --entrypoint /bin/bash ansible-docker   
+- Add support for custom username/group
+
+- Add test environment using molecule
+
+- Add github actions for CI
+
+- Add support for multi distribution starting with Ubuntu LTS
+
+- Add yazi configuration and add yazi bash function to cd on quit
+
+- Add bash customization (aliases, functions, environment variables)

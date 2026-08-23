@@ -1,0 +1,22 @@
+- name: Install podman and podman-related packages
+  become: true
+  ansible.builtin.package:
+    name:
+      - podman
+      - podman-docker
+      - podman-compose
+      - kind
+
+- name: Install Podman Desktop from flathub
+  community.general.flatpak:
+    name: io.podman_desktop.PodmanDesktop
+    remote: flathub
+    method: user
+    state: present
+
+- name: Enable and start podman service
+  become: true
+  ansible.builtin.systemd_service:
+    name: podman
+    state: started
+    enabled: true

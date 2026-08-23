@@ -1,0 +1,6 @@
+- name: Install Adobe Source Code Pro font
+  become: true
+  ansible.builtin.package:
+    name:
+      - adobe-source-code-pro-fonts
+    state: present

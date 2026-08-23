@@ -1,0 +1,76 @@
+#!/usr/bin/ansible-playbook --ask-become-pass
+---
+- name: Set up Fedora Workstation 44
+  hosts: localhost
+  connection: local
+  vars:
+    workstation_user: jrh
+    workstation_group: jrh
+    hostname: fedora
+
+  tasks:
+    - name: Only run on Fedora Workstation 44 hosts
+      when:
+        - ansible_facts['distribution'] == "Fedora"
+        - ansible_facts['distribution_major_version'] == "44"
+      block:
+        - name: Verify connectivity
+          ansible.builtin.ping:
+
+        - name: Set hostname
+          ansible.builtin.import_tasks: tasks/set_hostname.yml
+
+        - name: Install common command line utilities
+          ansible.builtin.import_tasks: tasks/command_line_utilities.yml
+
+        - name: Add flathub repo to flatpak remotes
+          ansible.builtin.import_tasks: tasks/add_flathub_remote.yml
+
+        - name: Install common flatpak applications
+          ansible.builtin.import_tasks: tasks/common_flatpak_applications.yml
+
+        - name: Configure GNOME settings
+          ansible.builtin.import_tasks: tasks/gnome_settings.yml
+
+        - name: Configure GNOME terminal (Ptyxis)
+          ansible.builtin.import_tasks: tasks/gnome_terminal.yml
+
+        - name: Enable support for containers (Podman)
+          ansible.builtin.import_tasks: tasks/podman.yml
+
+        - name: Install GitHub applications
+          ansible.builtin.import_tasks: tasks/github.yml
+
+        - name: Install Visual Studio Code
+          ansible.builtin.import_tasks: tasks/vscode.yml
+
+        - name: Install Hashicorp applications (Packer, Terraform, Vagrant)
+          ansible.builtin.import_tasks: tasks/hashicorp.yml
+
+        - name: Install and configure Amazon Web Services CLI tool
+          ansible.builtin.import_tasks: tasks/awscli.yml
+
+        - name: Install and configure Logitech Software
+          ansible.builtin.import_tasks: tasks/logitech.yml
+
+        - name: Install and configure Neovim
+          ansible.builtin.import_tasks: tasks/neovim.yml
+
+        - name: Install and configure git
+          ansible.builtin.import_tasks: tasks/git_configuration.yml
+
+        - name: Install and configure tmux
+          ansible.builtin.import_tasks: tasks/tmux.yml
+
+        - name: Install and configure yazi
+          ansible.builtin.import_tasks: tasks/yazi.yml
+
+        - name: Install and configure Alacritty terminal
+          ansible.builtin.import_tasks: tasks/alacritty_tasks.yml
+
+        - name: Enable and start sshd service
+          become: true
+          ansible.builtin.systemd_service:
+            name: sshd
+            state: started
+            enabled: true

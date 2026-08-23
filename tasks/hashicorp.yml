@@ -1,0 +1,37 @@
+- name: Add hashicorp repo key
+  become: true
+  ansible.builtin.rpm_key:
+    key: https://rpm.releases.hashicorp.com/gpg
+    state: present
+
+- name: Add hashicorp stable repo
+  become: true
+  ansible.builtin.yum_repository:
+    name: hashicorp
+    description: Hashicorp Stable - $basearch
+    baseurl: https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/stable
+    gpgkey: https://rpm.releases.hashicorp.com/gpg
+    file: hashicorp
+    gpgcheck: true
+    enabled: true
+    state: present
+
+- name: Add hashicorp test repo
+  become: true
+  ansible.builtin.yum_repository:
+    name: hashicorp-test
+    description: Hashicorp Test - $basearch
+    baseurl: https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/test
+    gpgkey: https://rpm.releases.hashicorp.com/gpg
+    file: hashicorp
+    gpgcheck: true
+    enabled: false
+    state: present
+
+- name: Install hashicorp packages
+  become: true
+  ansible.builtin.package:
+    name:
+      - terraform
+      - packer
+      - vagrant

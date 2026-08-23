@@ -1,0 +1,125 @@
+- name: Install tmux
+  become: true
+  ansible.builtin.package:
+    name:
+      - tmux
+    state: present
+
+- name: Create tmux config folder
+  ansible.builtin.file:
+    path: "/home/{{ workstation_user }}/.config/tmux"
+    state: directory
+    owner: "{{ workstation_user }}"
+    group: "{{ workstation_group }}"
+    mode: '0755'
+
+- name: Add tmux config
+  ansible.builtin.copy:
+    dest: /home/{{ workstation_user }}/.config/tmux/tmux.conf
+    owner: "{{ workstation_user }}"
+    group: "{{ workstation_group }}"
+    mode: '0644'
+    backup: true
+    content: |
+      # .config/tmux/tmux.conf
+      #For use with tmux v2.9a
+
+      # Use Default Shell
+      #set-option -g default-shell /usr/bin/zsh
+      #set-option -g default-command "reattach-to-user-namespace -l /usr/bin/zsh"
+
+      # Generic Options
+      set -sg escape-time 0      # set a low esape time, default 500(ms)
+      #set -sg update-environment "DISPLAY SSH_ASKPASS SSH_AUTH_SOCK SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY"
+      set -sg history-limit 5000 # large history scrollback
+
+      # Alert me
+      set -g bell-action      any       # any: bells in any connected session alert in current window
+      #set -g bell-on-alert    on        # ring on all activity
+      set -g visual-bell      on        # visual bell, not audible
+      set -g visual-activity  on        # any attached window
+      set -g display-time 4000 # show messages for 4 seconds
+
+      # Titles & status bar
+      set -g set-titles         on    # set the terminal title
+      set -g status             on    # always show the status bar
+      #set -g set-titles-string  "tmux:#I #W"
+      set -g status-interval    0     # update XX often seconds
+
+      # Set to VI mode
+      set -g status-keys vi
+      set -g mode-keys vi
+
+      # window options
+      setw -g alternate-screen  on    # preserve screen content after fullscreen apps restore
+      setw -g automatic-rename  on    # rename windows automatically
+      setw -g monitor-activity  on
+      setw -g xterm-keys        off   # disable xterm func keys
+
+      # mouse options all off
+      #set -g mouse-resize-pane on    # tmux captures the mouse, watch out!
+      #set -g mouse-select-pane on    # click in pane to activate
+      #set -g mouse-select-window on  # click on window name to activate
+      #setw -g mode-mouse off
+
+      #Change prefix to Control + a
+      #set -g prefix C-b
+      set -g prefix C-a
+      bind a send-prefix
+
+      #Set beginning window/pane number to 1
+      set -g base-index 1
+      setw -g pane-base-index 1
+
+      #Renumber windows automatically
+      set -g renumber-windows on
+                #set -g default-terminal "tmux-256color"
+      set-option -g bell-action none
+
+      # resize panes
+      bind -r M-h resize-pane -L 5
+      bind -r M-j resize-pane -D 5
+      bind -r M-k resize-pane -U 5
+      bind -r M-l resize-pane -R 5
+
+      bind R source-file ~/.tmux.conf \; display "Configuration reloaded."
+      bind S set synchronize-panes
+
+      # switch panes using Alt-arrow without prefix
+      bind -n M-Left select-pane -L
+      bind -n M-Right select-pane -R
+      bind -n M-Up select-pane -U
+      bind -n M-Down select-pane -D
+
+      # To see a list of colors run the following command
+      #in {0..255}; do
+      #   printf "\x1b[38;5;${i}mcolour${i}\x1b[0m\n"
+      #done
+
+      #  modes
+      setw -g clock-mode-colour colour232
+      setw -g clock-mode-style 12
+
+      # panes
+      set -g pane-border-style bg=default,fg=colour234
+      set -g pane-active-border-style bg=default,fg=colour237
+
+      # statusbar
+      set -g status-position bottom
+      set -g status-justify left
+      set -g status-style bg=default,fg=colour137,dim
+      set -g status-left ''
+      set -g status-right '#[fg=colour231,bg=default,bold] %m/%d #[fg=colour255,bg=default,bold] %H:%M '
+      #set -g status-right-length 50
+      #set -g status-left-length 20
+
+      setw -g window-status-current-style fg=colour1,bg=default,bold
+      setw -g window-status-current-format ' #I#[fg=colour249]:#[fg=colour255]#W#[fg=colour249]#F'
+
+      setw -g window-status-style fg=colour9,bg=default,none
+      setw -g window-status-format ' #I#[fg=colour237]:#[fg=colour250]#W#[fg=colour244]#F'
+
+      setw -g window-status-bell-style bg=default,fg=colour255,bold
+
+      # messages
+      #set -g message-style bg=default,fg=colour1,b

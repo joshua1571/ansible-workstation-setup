@@ -1,0 +1,52 @@
+- name: Install Solaar from flathub
+  community.general.flatpak:
+    name: io.github.pwr_solaar.solaar
+    remote: flathub
+    method: user
+    state: present
+
+- name: Install logiops
+  become: true
+  ansible.builtin.package:
+    name:
+      - logiops
+    state: present
+
+- name: Add /etc/logid.cfg
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/logid.cfg
+    owner: root
+    group: root
+    mode: '0644'
+    backup: true
+    content: |
+      // https://github.com/torvalds/linux/blob/master/include/uapi/linux/input-event-codes.h
+      // https://wiki.archlinux.org/title/Logitech_MX_Master#Mappings_for_extra_buttons
+
+      devices: (
+      {
+          name: "Wireless Mouse MX Master";
+          smartshift: { on: true; threshold: 10; };
+          hiresscroll: { hires: false; invert: false; target: false; };
+          dpi: 1000;
+          buttons: (
+          // Middle key
+          { cid: 0xc4; action = { type: "ToggleSmartshift"; }; },
+          // Thumb key
+          { cid: 0xc3; action = { type: "Keypress"; keys: ["KEY_LEFTMETA"]; }; },
+          // Forward key
+          // Mapped to the default GNOME desktop switch to left shortcut
+          { cid: 0x56; action = { type: "Keypress"; keys: ["KEY_LEFTMETA", "KEY_PAGEDOWN"]; }; },
+          // Back key
+          // Mapped to the default GNOME desktop switch to right shortcut
+          { cid: 0x53; action = { type: "Keypress"; keys: ["KEY_LEFTMETA", "KEY_PAGEUP"]; }; }
+          );
+      });
+
+- name: Enable and start logid service
+  become: true
+  ansible.builtin.systemd:
+    name: logid
+    state: started
+    enabled: true

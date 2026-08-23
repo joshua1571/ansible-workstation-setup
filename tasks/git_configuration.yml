@@ -1,0 +1,42 @@
+- name: Install git
+  become: true
+  ansible.builtin.package:
+    name:
+      - git
+    state: present
+
+- name: Create git config folder
+  ansible.builtin.file:
+    path: "/home/{{ workstation_user }}/.config/git"
+    state: directory
+    owner: "{{ workstation_user }}"
+    group: "{{ workstation_group }}"
+    mode: '0755'
+
+- name: Add git config
+  ansible.builtin.copy:
+    dest: /home/{{ workstation_user }}/.config/git/config
+    owner: "{{ workstation_user }}"
+    group: "{{ workstation_group }}"
+    mode: '0644'
+    backup: true
+    content: |
+      [color]
+      ui = "auto"
+
+      [core]
+      autoclrf = "true"
+      editor = code
+
+      [github]
+      user = "joshua1571"
+
+      [init]
+      defaultBranch = "main"
+
+      [user]
+      email = "joshua1571@users.noreply.github.com"
+      name = "Joshua Hernandez"
+
+      [web]
+      browser = "firefox"
