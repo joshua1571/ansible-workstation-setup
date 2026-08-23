@@ -1,0 +1,47 @@
+---
+# Ubuntu / Debian family package names.
+#
+# Names marked TODO have no direct apt equivalent and need a task-file branch
+# (upstream apt repo, .deb download, snap, or vendor installer) before the
+# matching task group can be enabled for the Debian family in
+# workstation-setup.yml.
+
+svc_sshd: ssh   # Debian names the unit `ssh`, not `sshd`
+
+pkg_cli_utilities:
+  - curl
+  - wget
+  - rsync
+  - nmap
+
+pkg_advanced_cli_utilities:
+  - fzf
+  - ripgrep
+  - jq
+
+pkg_git: git
+pkg_neovim: neovim
+pkg_tmux: tmux
+pkg_alacritty: alacritty            # universe; not present on 22.04
+pkg_source_code_pro_font: fonts-adobe-sourcecodepro
+
+pkg_containers:
+  - podman
+  - podman-compose                  # 24.04+ only
+
+# --- no apt equivalent yet ---------------------------------------------------
+pkg_gh_cli: ~                       # TODO: cli.github.com apt repo
+pkg_awscli: ~                       # TODO: apt ships v1; use the official v2 installer
+pkg_logiops: ~                      # TODO: build from source (PixlOne/logiops)
+pkg_yazi: ~                         # TODO: GitHub release binary or cargo
+pkg_hashicorp: []                   # TODO: apt.releases.hashicorp.com repo
+
+debian_port_todo:
+  - gnome_terminal (Ptyxis is Fedora-only; use gnome-terminal or ptyxis from 24.10+)
+  - podman (kind and podman-docker are not packaged)
+  - github (gh CLI apt repo)
+  - vscode (packages.microsoft.com apt repo)
+  - hashicorp (apt.releases.hashicorp.com repo)
+  - awscli (official v2 installer)
+  - logitech (logiops from source)
+  - yazi (release binary)

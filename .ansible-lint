@@ -1,0 +1,16 @@
+---
+# Start at `moderate`; CI also runs `production` as an advisory step so the
+# remaining gap is visible without blocking. Bump this line when that's clean.
+profile: moderate
+
+offline: true
+
+exclude_paths:
+  - .cache/
+  - .ansible/
+  - .github/
+
+kinds:
+  - playbook: "workstation-setup.yml"
+  - tasks: "tasks/**/*.yml"
+  - vars: "vars/**/*.yml"

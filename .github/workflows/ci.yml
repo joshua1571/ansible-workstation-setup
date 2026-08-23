@@ -1,0 +1,177 @@
+---
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+  pull_request:
+    branches: [main]
+  # Upstream repos (HashiCorp, Microsoft, COPR, Flathub) drift independently of
+  # this repo, so run weekly to catch breakage before a fresh install does.
+  schedule:
+    - cron: "0 13 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  ANSIBLE_FORCE_COLOR: "1"
+  PY_COLORS: "1"
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install linters
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible-core ansible-lint yamllint
+
+      - name: Install Galaxy collections
+        run: ansible-galaxy collection install -r requirements.yml
+
+      - name: yamllint
+        run: yamllint --strict .
+
+      - name: shellcheck
+        run: shellcheck setup.sh
+
+      - name: ansible-lint
+        run: ansible-lint --offline
+
+      # Advisory only: shows the gap between the enforced `moderate` profile in
+      # .ansible-lint and the stricter `production` profile. Flip .ansible-lint
+      # to `profile: production` once this step is clean, then delete this step.
+      - name: ansible-lint (production profile, advisory)
+        continue-on-error: true
+        run: ansible-lint --offline --profile production
+
+  syntax:
+    name: Syntax check (ansible-core ${{ matrix.label }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Oldest ansible-core we care about: what Ubuntu 24.04 LTS ships.
+          - spec: "ansible-core==2.16.*"
+            label: "2.16"
+          # What current Fedora ships / what pip gives you today.
+          - spec: "ansible-core"
+            label: "latest"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install ansible-core
+        run: |
+          python -m pip install --upgrade pip
+          pip install "${{ matrix.spec }}"
+
+      - name: Install Galaxy collections
+        run: ansible-galaxy collection install -r requirements.yml
+
+      - name: ansible-playbook --syntax-check
+        run: ansible-playbook workstation-setup.yml --syntax-check
+
+      - name: List tasks and tags
+        run: ansible-playbook workstation-setup.yml --list-tasks --list-tags
+
+  dry-run:
+    name: Dry run (${{ matrix.name }})
+    needs: [lint, syntax]
+    runs-on: ubuntu-latest
+    # Ubuntu legs are informational until the Debian-family task files land.
+    # Flip `experimental: false` per-distro as each one is ported.
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Fedora 44
+            image: "fedora:44"
+            experimental: false
+          - name: Ubuntu 24.04 LTS
+            image: "ubuntu:24.04"
+            experimental: true
+          - name: Ubuntu 22.04 LTS
+            image: "ubuntu:22.04"
+            experimental: true
+    container:
+      image: ${{ matrix.image }}
+    steps:
+      # Runs before checkout on purpose: the base images are minimal and need
+      # tar/git before actions/checkout will behave.
+      - name: Bootstrap container (Fedora)
+        if: startsWith(matrix.image, 'fedora')
+        run: |
+          dnf -y install --setopt=install_weak_deps=False \
+            ansible-core dnf-plugins-core python3-libdnf5 \
+            flatpak dconf dbus-daemon \
+            sudo git tar findutils procps-ng
+
+      - name: Bootstrap container (Ubuntu)
+        if: startsWith(matrix.image, 'ubuntu')
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          apt-get update -qq
+          apt-get install -y --no-install-recommends \
+            ansible-core python3-apt \
+            flatpak dconf-cli dbus-x11 \
+            sudo git tar ca-certificates gnupg procps
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Galaxy collections
+        run: ansible-galaxy collection install -r requirements.yml
+
+      - name: Create unprivileged target user
+        run: useradd --create-home --shell /bin/bash ciuser
+
+      # Skipped tags are the ones that cannot work in an unprivileged container:
+      #   hostname - needs hostnamectl / a real init
+      #   services - needs a running systemd (sshd, logid, podman.socket)
+      #   desktop  - needs a live GNOME session and Ptyxis gsettings schemas
+      #   flatpak  - would pull multiple GB of runtimes on every run
+      - name: Converge
+        run: |
+          ansible-playbook workstation-setup.yml \
+            --diff \
+            --skip-tags "hostname,services,desktop,flatpak" \
+            -e workstation_user=ciuser \
+            -e workstation_group=ciuser
+
+      - name: Idempotence
+        run: |
+          ansible-playbook workstation-setup.yml \
+            --diff \
+            --skip-tags "hostname,services,desktop,flatpak" \
+            -e workstation_user=ciuser \
+            -e workstation_group=ciuser \
+          | tee /tmp/idempotence.log
+          grep -q 'changed=0.*failed=0' /tmp/idempotence.log \
+            || { echo "::error::Playbook is not idempotent"; exit 1; }

@@ -1,0 +1,38 @@
+---
+# Fedora / Red Hat family package names.
+
+svc_sshd: sshd
+
+pkg_cli_utilities:
+  - curl
+  - wget
+  - rsync
+  - nmap
+
+pkg_advanced_cli_utilities:
+  - fzf
+  - ripgrep
+  - jq
+
+pkg_git: git
+pkg_neovim: neovim
+pkg_tmux: tmux
+pkg_alacritty: alacritty
+pkg_source_code_pro_font: adobe-source-code-pro-fonts
+pkg_gh_cli: gh
+pkg_awscli: awscli2
+pkg_logiops: logiops
+pkg_yazi: yazi
+
+pkg_containers:
+  - podman
+  - podman-docker
+  - podman-compose
+  - kind
+
+pkg_hashicorp:
+  - terraform
+  - packer
+  - vagrant
+
+debian_port_todo: []

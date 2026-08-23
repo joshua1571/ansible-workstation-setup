@@ -1,0 +1,23 @@
+---
+# Fallback values. Anything a task file needs must have a sane default here so
+# the playbook still parses on a platform without a dedicated vars file.
+
+svc_sshd: sshd
+
+pkg_cli_utilities:
+  - curl
+  - wget
+  - rsync
+  - nmap
+
+pkg_advanced_cli_utilities:
+  - fzf
+  - ripgrep
+  - jq
+
+pkg_git: git
+pkg_neovim: neovim
+pkg_tmux: tmux
+pkg_alacritty: alacritty
+
+debian_port_todo: []
