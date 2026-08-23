@@ -112,11 +112,8 @@ jobs:
           - name: Fedora 44
             image: "fedora:44"
             experimental: false
-          - name: Ubuntu 24.04 LTS
-            image: "ubuntu:24.04"
-            experimental: true
-          - name: Ubuntu 22.04 LTS
-            image: "ubuntu:22.04"
+          - name: Ubuntu 26.04 LTS
+            image: "ubuntu:26.04"
             experimental: true
     container:
       image: ${{ matrix.image }}
