@@ -2,11 +2,53 @@
 
 set -euo pipefail
 
-echo "Update and Upgrade packages before starting"
-sudo dnf update && sudo dnf upgrade
+echo "Detecting operating system..."
 
-echo "Install ansible and ansible-lint"
-sudo dnf install python3 ansible ansible-lint
+# Load OS information
+source /etc/os-release
 
-echo "Verify that ansible was installed"
-which ansible-playbook
+case "$ID" in
+    ubuntu)
+        echo "Ubuntu detected."
+        echo "Updating and upgrading packages..."
+        sudo apt update
+        sudo apt upgrade -y
+
+        echo "Installing Ansible and ansible-lint..."
+        sudo apt install -y ansible ansible-lint
+        ;;
+
+    fedora)
+        echo "Fedora detected."
+        echo "Updating and upgrading packages..."
+        sudo dnf upgrade --refresh -y
+
+        echo "Installing Ansible and ansible-lint..."
+        sudo dnf install -y ansible ansible-lint
+        ;;
+
+    *)
+        echo "Unsupported operating system: $ID"
+        exit 1
+        ;;
+esac
+
+echo "Verifying Ansible installation..."
+
+if command -v ansible-playbook >/dev/null 2>&1; then
+    echo "Ansible installed successfully:"
+    ansible-playbook --version
+else
+    echo "Error: ansible-playbook was not found."
+    exit 1
+fi
+
+if command -v ansible-lint >/dev/null 2>&1; then
+    echo "ansible-lint installed successfully:"
+    ansible-lint --version
+else
+    echo "Error: ansible-lint was not found."
+    exit 1
+fi
+
+echo "Installation complete."

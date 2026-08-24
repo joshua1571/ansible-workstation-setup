@@ -1,0 +1,16 @@
+---
+git_package: git
+
+# Identity
+git_user_name: "Joshua Hernandez"
+git_user_email: "joshua1571@users.noreply.github.com"
+git_github_user: joshua1571
+
+# Behaviour
+git_default_branch: main
+# "input" (not "true") is correct on Linux: normalise CRLF on commit,
+# never rewrite to CRLF on checkout.
+git_autocrlf: input
+# --wait is required or git returns before the editor has saved.
+git_editor: "code --wait"
+git_web_browser: firefox

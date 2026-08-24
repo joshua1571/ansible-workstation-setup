@@ -1,0 +1,22 @@
+# {{ ansible_managed }}
+# Managed by the `git` role - local edits will be overwritten.
+
+[color]
+	ui = auto
+
+[core]
+	autocrlf = {{ git_autocrlf }}
+	editor = {{ git_editor }}
+
+[init]
+	defaultBranch = {{ git_default_branch }}
+
+[user]
+	name = {{ git_user_name }}
+	email = {{ git_user_email }}
+
+[github]
+	user = {{ git_github_user }}
+
+[web]
+	browser = {{ git_web_browser }}

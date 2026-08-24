@@ -1,0 +1,22 @@
+---
+- name: Create font directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ fonts_source_code_pro_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Download and extract Source Code Pro
+  become: true
+  ansible.builtin.unarchive:
+    src: >-
+      https://github.com/adobe-fonts/source-code-pro/releases/download/{{
+      fonts_source_code_pro_release | replace('/', '%2F') }}/{{ fonts_source_code_pro_asset }}
+    dest: "{{ fonts_source_code_pro_dir }}"
+    remote_src: true
+    extra_opts: ["-j"]
+    include: ["*.otf"]
+    creates: "{{ fonts_source_code_pro_dir }}/SourceCodePro-Regular.otf"
+  notify: Rebuild font cache

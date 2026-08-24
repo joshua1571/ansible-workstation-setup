@@ -6,6 +6,7 @@
 # matching task group can be enabled for the Debian family in
 # workstation-setup.yml.
 
+ansible_become_exe: /usr/bin/sudo.ws
 svc_sshd: ssh   # Debian names the unit `ssh`, not `sshd`
 
 pkg_cli_utilities:

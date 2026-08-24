@@ -1,0 +1,7 @@
+---
+# Release tag contains slashes (roman/italic/variable versions) which must be
+# percent-encoded in the download URL. urlencode does NOT do this - it treats
+# "/" as a safe path separator. Hence the explicit replace below.
+fonts_source_code_pro_release: "2.042R-u/1.062R-i/1.026R-vf"
+fonts_source_code_pro_asset: "OTF-source-code-pro-2.042R-u_1.062R-i.zip"
+fonts_source_code_pro_dir: /usr/local/share/fonts/source-code-pro

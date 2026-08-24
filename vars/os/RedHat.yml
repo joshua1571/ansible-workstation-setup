@@ -1,6 +1,6 @@
 ---
 # Fedora / Red Hat family package names.
-
+ansible_become_exe: /usr/bin/sudo
 svc_sshd: sshd
 
 pkg_cli_utilities:

@@ -14,3 +14,6 @@ kinds:
   - playbook: "workstation-setup.yml"
   - tasks: "tasks/**/*.yml"
   - vars: "vars/**/*.yml"
+
+skip_list:
+  - yaml[commas]

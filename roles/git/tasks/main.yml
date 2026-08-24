@@ -1,0 +1,34 @@
+---
+- name: Install git
+  become: true
+  ansible.builtin.package:
+    name: "{{ git_package }}"
+    state: present
+
+- name: Look up the target user's account
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ workstation_user }}"
+
+- name: Resolve the target user's home directory
+  ansible.builtin.set_fact:
+    git_workstation_home: "{{ ansible_facts['getent_passwd'][workstation_user][4] }}"
+
+- name: Create git config directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ git_workstation_home }}/.config/git"
+    state: directory
+    owner: "{{ workstation_user }}"
+    group: "{{ workstation_group }}"
+    mode: "0755"
+
+- name: Write git config
+  become: true
+  ansible.builtin.template:
+    src: config.j2
+    dest: "{{ git_workstation_home }}/.config/git/config"
+    owner: "{{ workstation_user }}"
+    group: "{{ workstation_group }}"
+    mode: "0644"
+    backup: true
