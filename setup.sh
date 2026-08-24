@@ -1,54 +1,47 @@
 #!/usr/bin/env bash
+#
+# Bootstrap a fresh workstation so playbook.yml can run.
+# Everything here must work with no Ansible present.
 
 set -euo pipefail
 
-echo "Detecting operating system..."
+# shellcheck source=/dev/null
+. /etc/os-release
 
-# Load OS information
-source /etc/os-release
+echo "==> Detected ${NAME} ${VERSION_ID} (family: ${ID_LIKE:-$ID})"
 
-case "$ID" in
-    ubuntu)
-        echo "Ubuntu detected."
-        echo "Updating and upgrading packages..."
-        sudo apt update
-        sudo apt upgrade -y
+case "${ID}" in
+  fedora)
+    sudo dnf -y upgrade --refresh
+    sudo dnf -y install python3 ansible-core ansible-lint yamllint ShellCheck git
+    ;;
+  ubuntu | debian)
+    export DEBIAN_FRONTEND=noninteractive
+    sudo apt-get update
+    sudo apt-get -y upgrade
+    sudo apt-get -y install python3 ansible-core ansible-lint yamllint shellcheck git
 
-        echo "Installing Ansible and ansible-lint..."
-        sudo apt install -y ansible ansible-lint
-        ;;
-
-    fedora)
-        echo "Fedora detected."
-        echo "Updating and upgrading packages..."
-        sudo dnf upgrade --refresh -y
-
-        echo "Installing Ansible and ansible-lint..."
-        sudo dnf install -y ansible ansible-lint
-        ;;
-
-    *)
-        echo "Unsupported operating system: $ID"
-        exit 1
-        ;;
+    # Ubuntu 25.10+ defaults to sudo-rs, which ignores sudo's -p prompt flag.
+    # Ansible relies on that flag to detect the password prompt, so become
+    # times out. Pull in classic sudo if the archive still carries it.
+    # NOTE: Canonical plans to drop this fallback in 26.10.
+    if ! command -v sudo-ws >/dev/null 2>&1; then
+      sudo apt-get -y install sudo-ws || \
+        echo "!! classic sudo unavailable - set a NOPASSWD sudoers rule instead"
+    fi
+    ;;
+  *)
+    echo "!! Unsupported distribution: ${ID}" >&2
+    exit 1
+    ;;
 esac
 
-echo "Verifying Ansible installation..."
+echo "==> Installing Galaxy collections"
+ansible-galaxy collection install -r requirements.yml
 
-if command -v ansible-playbook >/dev/null 2>&1; then
-    echo "Ansible installed successfully:"
-    ansible-playbook --version
-else
-    echo "Error: ansible-playbook was not found."
-    exit 1
-fi
+echo "==> Enabling repo-tracked git hooks"
+git config core.hooksPath .githooks
 
-if command -v ansible-lint >/dev/null 2>&1; then
-    echo "ansible-lint installed successfully:"
-    ansible-lint --version
-else
-    echo "Error: ansible-lint was not found."
-    exit 1
-fi
-
-echo "Installation complete."
+echo "==> Verifying"
+command -v ansible-playbook
+ansible --version | head -1

@@ -44,23 +44,17 @@ jobs:
           pip install ansible-core ansible-lint yamllint
 
       - name: Install Galaxy collections
-        run: ansible-galaxy collection install -r requirements.yml
+        run: make deps
 
-      - name: yamllint
-        run: yamllint --strict .
+      - name: Lint
+        run: make lint
 
-      - name: shellcheck
-        run: shellcheck setup.sh
-
-      - name: ansible-lint
-        run: ansible-lint --offline
-
-      # Advisory only: shows the gap between the enforced `moderate` profile in
-      # .ansible-lint and the stricter `production` profile. Flip .ansible-lint
-      # to `profile: production` once this step is clean, then delete this step.
-      - name: ansible-lint (production profile, advisory)
+      # Advisory only: shows the gap between the enforced profile in
+      # .ansible-lint and `production`. Flip .ansible-lint to
+      # `profile: production` once this is clean, then delete this step.
+      - name: Lint (production profile, advisory)
         continue-on-error: true
-        run: ansible-lint --offline --profile production
+        run: make lint-production
 
   syntax:
     name: Syntax check (ansible-core ${{ matrix.label }})
@@ -90,13 +84,10 @@ jobs:
           pip install "${{ matrix.spec }}"
 
       - name: Install Galaxy collections
-        run: ansible-galaxy collection install -r requirements.yml
+        run: make deps
 
-      - name: ansible-playbook --syntax-check
-        run: ansible-playbook playbook.yml --syntax-check
-
-      - name: List tasks and tags
-        run: ansible-playbook playbook.yml --list-tasks --list-tags
+      - name: Syntax check
+        run: make syntax
 
   dry-run:
     name: Dry run (${{ matrix.name }})
@@ -115,6 +106,9 @@ jobs:
           - name: Ubuntu 26.04 LTS
             image: "ubuntu:26.04"
             experimental: true
+          - name: Ubuntu 24.04 LTS
+            image: "ubuntu:24.04"
+            experimental: true
     container:
       image: ${{ matrix.image }}
     steps:
@@ -126,7 +120,7 @@ jobs:
           dnf -y install --setopt=install_weak_deps=False \
             ansible-core dnf-plugins-core python3-libdnf5 \
             flatpak dconf dbus-daemon \
-            sudo git tar findutils procps-ng
+            make sudo git tar findutils procps-ng
 
       - name: Bootstrap container (Ubuntu)
         if: startsWith(matrix.image, 'ubuntu')
@@ -137,37 +131,20 @@ jobs:
           apt-get install -y --no-install-recommends \
             ansible-core python3-apt \
             flatpak dconf-cli dbus-x11 \
-            sudo git tar ca-certificates gnupg procps
+            make sudo git tar ca-certificates gnupg procps
 
       - name: Check out repository
         uses: actions/checkout@v5
 
       - name: Install Galaxy collections
-        run: ansible-galaxy collection install -r requirements.yml
+        run: make deps
 
       - name: Create unprivileged target user
         run: useradd --create-home --shell /bin/bash ciuser
 
-      # Skipped tags are the ones that cannot work in an unprivileged container:
-      #   hostname - needs hostnamectl / a real init
-      #   services - needs a running systemd (sshd, logid, podman.socket)
-      #   desktop  - needs a live GNOME session and Ptyxis gsettings schemas
-      #   flatpak  - would pull multiple GB of runtimes on every run
-      - name: Converge
-        run: |
-          ansible-playbook playbook.yml \
-            --diff \
-            --skip-tags "hostname,services,desktop,flatpak" \
-            -e workstation_user=ciuser \
-            -e workstation_group=ciuser
-
-      - name: Idempotence
-        run: |
-          ansible-playbook playbook.yml \
-            --diff \
-            --skip-tags "hostname,services,desktop,flatpak" \
-            -e workstation_user=ciuser \
-            -e workstation_group=ciuser \
-          | tee /tmp/idempotence.log
-          grep -q 'changed=0.*failed=0' /tmp/idempotence.log \
-            || { echo "::error::Playbook is not idempotent"; exit 1; }
+      # CONVERGE_SKIP_TAGS defaults in the Makefile to the tags that cannot
+      # work in an unprivileged container: hostname (needs a real init),
+      # services (needs systemd), desktop (needs a GNOME session), and
+      # flatpak (would pull multiple GB per run).
+      - name: Converge and check idempotence
+        run: make idempotence CONVERGE_USER=ciuser CONVERGE_GROUP=ciuser

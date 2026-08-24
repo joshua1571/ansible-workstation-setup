@@ -44,24 +44,24 @@
           Configuring {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}
           ({{ ansible_facts['os_family'] }} family)
       tags: [always]
-      
+
     - name: Verify connectivity
       ansible.builtin.ping:
       tags: [always]
 
   roles:
-    - {role: base,       tags: [base]}
-    - {role: fonts,      tags: [fonts]}
-    - {role: git,        tags: [git]}
-    #- {role: neovim,     tags: [editors, neovim]}
-    #- {role: tmux,       tags: [tmux]}
-    #- {role: alacritty,  tags: [terminal, alacritty]}
-    #- {role: flatpak,    tags: [flatpak]}
-    #- {role: gnome,      tags: [desktop, gnome]}
-    #- {role: containers, tags: [containers, podman]}
-    #- {role: vscode,     tags: [editors, vscode]}
-    #- {role: hashicorp,  tags: [hashicorp]}
-    #- {role: awscli,     tags: [awscli]}
-    #- {role: github,     tags: [github]}
-    #- {role: yazi,       tags: [yazi]}
-    #- {role: logitech,   tags: [peripherals, logitech]}
+    - {role: base, tags: [base]}
+    - {role: fonts, tags: [fonts]}
+    - {role: git, tags: [git]}
+    # - {role: neovim, tags: [editors, neovim]}
+    # - {role: tmux, tags: [tmux]}
+    # - {role: alacritty, tags: [terminal, alacritty]}
+    # - {role: flatpak, tags: [flatpak]}
+    # - {role: gnome, tags: [desktop, gnome]}
+    # - {role: containers, tags: [containers, podman]}
+    # - {role: vscode, tags: [editors, vscode]}
+    # - {role: hashicorp, tags: [hashicorp]}
+    # - {role: awscli, tags: [awscli]}
+    # - {role: github, tags: [github]}
+    # - {role: yazi, tags: [yazi]}
+    # - {role: logitech, tags: [peripherals, logitech]}
