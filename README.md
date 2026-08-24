@@ -1,11 +1,18 @@
+
 ### Purpose
 I created this playbook to configure a brand new fedora workstation install to configure everything for me.
 
 Tested on Fedora 44 Workstation
 
+
+> [!NOTE]
+> Claude was used to help build this playbook
+
+
 ### Prerequisites
 User should already be created
 Internet connectivity is established
+
 
 ### How to Use
 1. Clone this repository to the newly created Fedora workstation
@@ -18,18 +25,17 @@ Internet connectivity is established
 
 5. Run ``./workstation-setup.yml`` which will configure host
 
+
 ### TODOs
 
-- Add support for remote installation
+- [ ] Add support for remote installation
 
-- Add support for custom username/group
+- [ ] Explore using molecule
 
-- Add test environment using molecule
+- [ ] Add github actions for CI
 
-- Add github actions for CI
+- [ ] Add support for multi distribution starting with Ubuntu LTS
 
-- Add support for multi distribution starting with Ubuntu LTS
+- [ ] Add yazi configuration and add yazi bash function to cd on quit
 
-- Add yazi configuration and add yazi bash function to cd on quit
-
-- Add bash customization (aliases, functions, environment variables)
+- [ ] Add bash customization (aliases, functions, environment variables)

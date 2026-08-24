@@ -4,15 +4,19 @@ extends: default
 ignore: |
   .cache/
   .ansible/
-  ansible.cfg
-  README.md
-  setup.sh
-  .githooks/
 
 rules:
   # Task files in tasks/ are fragments included by the playbook and
   # intentionally omit the document start marker.
   document-start: disable
+
+  # The three rules below are mandated by ansible-lint, which refuses to
+  # merge a custom yamllint config that disagrees with its baseline.
+  comments-indentation: false
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true
+
   line-length:
     max: 160
     level: warning
