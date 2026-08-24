@@ -1,4 +1,15 @@
-- name: Install common command-line utilities
+---
+- name: Load OS-specific package names
+  ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_facts['distribution'] }}.yml"
+        - "{{ ansible_facts['os_family'] }}.yml"
+      paths: ["{{ role_path }}/vars"]
+
+- name: Install base packages
   become: true
   ansible.builtin.package:
-    name: "{{ pkg_cli_utilities }}"
+    name: "{{ base_packages_common + base_packages_extra }}"
+    state: present

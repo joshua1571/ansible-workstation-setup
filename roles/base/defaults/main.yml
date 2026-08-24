@@ -1,0 +1,8 @@
+---
+base_packages_common:
+  - curl
+  - wget
+  - rsync
+  - nmap
+  - unzip
+base_packages_extra: []

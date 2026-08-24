@@ -4,20 +4,6 @@
 
 svc_sshd: sshd
 
-pkg_cli_utilities:
-  - curl
-  - wget
-  - rsync
-  - unzip
-  - make
-
-pkg_advanced_cli_utilities:
-  - fzf
-  - ripgrep
-  - jq
-  - nmap
-  - shellcheck
-
 pkg_git: git
 pkg_neovim: neovim
 pkg_tmux: tmux

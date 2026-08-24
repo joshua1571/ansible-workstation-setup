@@ -3,6 +3,3 @@
 
 - name: Import - command_line_utilities.yml
   ansible.builtin.import_tasks: command_line_utilities.yml
-
-- name: Import - advanced_command_line_utilities.yml
-  ansible.builtin.import_tasks: advanced_command_line_utilities.yml

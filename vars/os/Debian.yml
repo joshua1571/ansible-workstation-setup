@@ -9,17 +9,6 @@
 ansible_become_exe: /usr/bin/sudo.ws
 svc_sshd: ssh   # Debian names the unit `ssh`, not `sshd`
 
-pkg_cli_utilities:
-  - curl
-  - wget
-  - rsync
-  - nmap
-
-pkg_advanced_cli_utilities:
-  - fzf
-  - ripgrep
-  - jq
-
 pkg_git: git
 pkg_neovim: neovim
 pkg_tmux: tmux

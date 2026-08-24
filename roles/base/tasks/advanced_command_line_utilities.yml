@@ -1,4 +1,0 @@
-- name: Install advanced command-line utilities
-  become: true
-  ansible.builtin.package:
-    name: "{{ pkg_advanced_cli_utilities }}"
