@@ -93,10 +93,10 @@ jobs:
         run: ansible-galaxy collection install -r requirements.yml
 
       - name: ansible-playbook --syntax-check
-        run: ansible-playbook workstation-setup.yml --syntax-check
+        run: ansible-playbook playbook.yml --syntax-check
 
       - name: List tasks and tags
-        run: ansible-playbook workstation-setup.yml --list-tasks --list-tags
+        run: ansible-playbook playbook.yml --list-tasks --list-tags
 
   dry-run:
     name: Dry run (${{ matrix.name }})
@@ -155,7 +155,7 @@ jobs:
       #   flatpak  - would pull multiple GB of runtimes on every run
       - name: Converge
         run: |
-          ansible-playbook workstation-setup.yml \
+          ansible-playbook playbook.yml \
             --diff \
             --skip-tags "hostname,services,desktop,flatpak" \
             -e workstation_user=ciuser \
@@ -163,7 +163,7 @@ jobs:
 
       - name: Idempotence
         run: |
-          ansible-playbook workstation-setup.yml \
+          ansible-playbook playbook.yml \
             --diff \
             --skip-tags "hostname,services,desktop,flatpak" \
             -e workstation_user=ciuser \

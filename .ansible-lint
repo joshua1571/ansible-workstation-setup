@@ -11,7 +11,7 @@ exclude_paths:
   - .github/
 
 kinds:
-  - playbook: "workstation-setup.yml"
+  - playbook: "playbook.yml"
   - tasks: "tasks/**/*.yml"
   - vars: "vars/**/*.yml"
 
