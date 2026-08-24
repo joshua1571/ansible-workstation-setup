@@ -5,6 +5,7 @@ PLAYBOOK           ?= playbook.yml
 CONVERGE_SKIP_TAGS ?= hostname,services,desktop,flatpak
 CONVERGE_USER      ?= $(USER)
 CONVERGE_GROUP     ?= $(USER)
+IDEMPOTENCE_LOG    ?= /tmp/idempotence.log
 
 .PHONY: bootstrap deps hooks lint lint-production syntax check converge idempotence run
 
@@ -39,10 +40,15 @@ converge:
 	  -e workstation_user=$(CONVERGE_USER) \
 	  -e workstation_group=$(CONVERGE_GROUP)
 
+## Converge twice: the first pass applies, the second must be a no-op.
+## Asserting on the first pass is meaningless - a clean host always reports changes.
 idempotence:
-	$(MAKE) converge | tee /tmp/idempotence.log
-	grep -q "changed=0.*failed=0" /tmp/idempotence.log \
-	  || { echo "Playbook is not idempotent"; exit 1; }
+	@echo "== converge 1/2: apply =="
+	$(MAKE) --no-print-directory converge
+	@echo "== converge 2/2: verify no changes =="
+	$(MAKE) --no-print-directory converge | tee $(IDEMPOTENCE_LOG)
+	@grep -Eq 'changed=0.*unreachable=0.*failed=0' $(IDEMPOTENCE_LOG) \
+	  || { echo "Playbook is not idempotent: the second converge reported changes (see the tasks marked 'changed' above)"; exit 1; }
 
 run:
 	./$(PLAYBOOK)
