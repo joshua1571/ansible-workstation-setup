@@ -9,6 +9,11 @@ exclude_paths:
   - .cache/
   - .ansible/
   - .github/
+  - .githooks/
+  - Makefile
+  - README.md
+  - setup.sh
+  - .gitignore
 
 kinds:
   - playbook: "playbook.yml"
