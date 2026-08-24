@@ -23,10 +23,12 @@ case "${ID}" in
 
     # Ubuntu 25.10+ defaults to sudo-rs, which ignores sudo's -p prompt flag.
     # Ansible relies on that flag to detect the password prompt, so become
-    # times out. Pull in classic sudo if the archive still carries it.
+    # times out. Pull in classic sudo - packaged as `sudo`, installed
+    # alongside sudo-rs with its binaries under a .ws suffix - if the archive
+    # still carries it.
     # NOTE: Canonical plans to drop this fallback in 26.10.
-    if ! command -v sudo-ws >/dev/null 2>&1; then
-      sudo apt-get -y install sudo-ws || \
+    if ! command -v sudo.ws >/dev/null 2>&1; then
+      sudo apt-get -y install sudo || \
         echo "!! classic sudo unavailable - set a NOPASSWD sudoers rule instead"
     fi
     ;;
