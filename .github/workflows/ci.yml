@@ -106,9 +106,6 @@ jobs:
           - name: Ubuntu 26.04 LTS
             image: "ubuntu:26.04"
             experimental: true
-          - name: Ubuntu 24.04 LTS
-            image: "ubuntu:24.04"
-            experimental: true
     container:
       image: ${{ matrix.image }}
     steps:
