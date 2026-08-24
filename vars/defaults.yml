@@ -8,12 +8,15 @@ pkg_cli_utilities:
   - curl
   - wget
   - rsync
-  - nmap
+  - unzip
+  - make
 
 pkg_advanced_cli_utilities:
   - fzf
   - ripgrep
   - jq
+  - nmap
+  - shellcheck
 
 pkg_git: git
 pkg_neovim: neovim
