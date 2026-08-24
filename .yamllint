@@ -7,6 +7,7 @@ ignore: |
   ansible.cfg
   README.md
   setup.sh
+  .githooks/
 
 rules:
   # Task files in tasks/ are fragments included by the playbook and
